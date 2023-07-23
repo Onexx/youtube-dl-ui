@@ -3,6 +3,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+wix311
+app
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

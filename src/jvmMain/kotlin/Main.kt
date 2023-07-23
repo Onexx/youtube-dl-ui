@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ suspend fun runConsoleApp(command: String, outputCallback: suspend (String) -> U
     reader.close()
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 @Preview
 fun App() {
@@ -69,12 +71,25 @@ fun App() {
                         output.value =
                             "Invalid URL.\nPlease enter a valid URL similar to 'https://www.youtube.com/watch?v=XXXX'"
                     } else {
+                        output.value = "Trying to download video in 1080p\n"
+                        var failed = false
                         GlobalScope.launch(Dispatchers.IO) {
-                            runConsoleApp("app\\resources\\youtube-dl -o \"~/Downloads/%(title)s.%(ext)s\" ${text.value}") { line ->
+                            runConsoleApp("app\\resources\\youtube-dl -f 137 -o \"~/Downloads/%(title)s.%(ext)s\" ${text.value}") { line ->
                                 output.value += "$line\n"
+                                if (line.contains("ERROR")) {
+                                    failed = true
+                                    output.value += "Found error, retrying with default options\n"
+                                }
                                 scrollState.scrollTo(scrollState.maxValue)
                             }
                             scrollState.scrollTo(scrollState.maxValue)
+                            if (failed) {
+                                runConsoleApp("app\\resources\\youtube-dl -o \"~/Downloads/%(title)s.%(ext)s\" ${text.value}") { line ->
+                                    output.value += "$line\n"
+                                    scrollState.scrollTo(scrollState.maxValue)
+                                }
+                                scrollState.scrollTo(scrollState.maxValue)
+                            }
                         }
                     }
                 },

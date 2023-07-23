@@ -35,11 +35,8 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "youtube-dl"
-            packageVersion = "1.0.0"
+            packageVersion = "1.1.0"
             appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
         }
-//        buildTypes.release.proguard {
-//            configurationFiles.from(project.file("compose-desktop.pro"))
-//        }
     }
 }
